@@ -1,7 +1,7 @@
-# resource "aws_iam_instance_profile" "runner_instance_profile" {
-#   name = "runner_instance_profile"
-#   role = aws_iam_role.github_actions_assume_role.name
-# }
+resource "aws_iam_instance_profile" "runner_instance_profile" {
+  name = "runner_instance_profile"
+  role = aws_iam_role.github_actions_assume_role.name
+}
 
 data "aws_iam_policy_document" "assume_role" {
   statement {

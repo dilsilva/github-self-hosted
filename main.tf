@@ -21,7 +21,7 @@ module "runner" {
   source                = "./modules/runner"
 
   ami_id                = var.ami_id
-  vpc_id                = module.vpc.vpc_id
+  vpc_id                = module.vpc.default_vpc_id
   runner_instance_type  = "t2.micro"
   subnet_id             = tostring(module.vpc.public_subnets[0])
   default_tags = merge(

@@ -13,6 +13,8 @@ resource "aws_instance" "gh-runner" {
   instance_type        = var.runner_instance_type
   iam_instance_profile = aws_iam_instance_profile.runner_instance_profile.name
   user_data            = file("${path.module}/userdata.sh")
+
+  subnet_id               = var.subnet_id
   vpc_security_group_ids  = [aws_security_group.gh-runner.id]
 
   # network_interface {

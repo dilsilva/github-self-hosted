@@ -23,8 +23,7 @@ jobs:
           ec2-image-id: ami-02141377eee7defb9
           ec2-instance-type: t3.nano
           subnet-id: subnet-0458f5906f3685c08
-          security-group-id:	
-sg-00ed4a21eea0e2bba
+          security-group-id: sg-00ed4a21eea0e2bba
           iam-role-name: runner_instance_profile # optional, requires additional permissions
           aws-resource-tags: > # optional, requires additional permissions
             [

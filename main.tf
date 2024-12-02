@@ -8,6 +8,7 @@ module "vpc" {
   private_subnets = var.private_subnets
   public_subnets  = var.public_subnets
 
+  map_public_ip_on_launch =   true
   enable_nat_gateway = true
 
   default_vpc_tags = merge(
@@ -20,10 +21,12 @@ module "vpc" {
 module "runner" {
   source                = "./modules/runner"
 
-  ami_id                = var.ami_id
-  vpc_id                = module.vpc.default_vpc_id
-  runner_instance_type  = "t2.micro"
+  vpc_id                = module.vpc.vpc_id
   subnet_id             = tostring(module.vpc.public_subnets[0])
+  
+  ami_id                = var.ami_id
+  runner_instance_type  = "t2.micro"
+
   default_tags = merge(
     var.default_tags, {
       Name = "gh-runner"

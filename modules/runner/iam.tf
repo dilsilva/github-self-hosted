@@ -19,8 +19,7 @@ data "aws_iam_policy_document" "assume_role" {
 # Apply Least Privilege ASAP
 data "aws_iam_policy_document" "runner_policy" {
   statement {
-    # actions   = ["ec2:ReplaceIamInstanceProfileAssociation", "ec2:AssociateIamInstanceProfile"]
-    actions   = ["ec2:*"]
+    actions   = ["ec2:ReplaceIamInstanceProfileAssociation", "ec2:AssociateIamInstanceProfile"]
     resources = ["*"]
   }
   statement {

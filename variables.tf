@@ -39,6 +39,6 @@ variable "azs" {
 
 #Runner
 variable "ami_id" {
-  default = "ami-02141377eee7defb9"
+  default = "ami-0e9085e60087ce171"
   type    = string
 }

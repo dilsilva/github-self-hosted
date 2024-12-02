@@ -3,7 +3,7 @@ on: push
 jobs:
   do-the-job:
     name: Do the job on the runner
-    runs-on: aws-runner
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       - name: Hello World

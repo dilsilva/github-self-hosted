@@ -1,12 +1,12 @@
 name: do-the-job
 on: push
 jobs:
-  start-runner:
-    name: Start self-hosted EC2 runner
-    runs-on: aws-runner
-    outputs:
-      label: ${{ steps.start-ec2-runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+  # start-runner:
+  #   name: Start self-hosted EC2 runner
+  #   runs-on: aws-runner
+  #   outputs:
+  #     label: ${{ steps.start-ec2-runner.outputs.label }}
+  #     ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     # steps:
     #   - name: Configure AWS credentials
     #     uses: aws-actions/configure-aws-credentials@v4

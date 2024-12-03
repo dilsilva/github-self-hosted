@@ -1,7 +1,7 @@
 resource "aws_security_group" "gh-runner" {
-  name = "gh-runner"
+  name        = "gh-runner"
   description = "Allows necessary ports to gh runner communicate"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_tls" {

@@ -33,12 +33,12 @@ jobs:
       with: 
         repository: 'dilsilva/go-load-generator'
 
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.23.x'
-    - name: Install dependencies
-      run: go get ./cmd/loadgen/
+    # - name: Setup Go
+    #   uses: actions/setup-go@v5
+    #   with:
+    #     go-version: '1.23.x'
+    # - name: Install dependencies
+    #   run: go get ./cmd/loadgen/
     # - name: Unit Test 
     #   run: go test -v -cover ./...
     

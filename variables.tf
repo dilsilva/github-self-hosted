@@ -50,5 +50,5 @@ variable "ami_id" {
 
 #EKS
 variable "instance_type" {
-  default = "t2.micro"
+  default = "t2.medium"
 }

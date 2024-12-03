@@ -89,6 +89,7 @@ module "bastion" {
   bucket_name                = "${var.project}-bastion-bucket"
   region                     = var.region
   vpc_id                     = module.vpc.vpc_id
+  instance_type              = var.instance_type
   is_lb_private              = "false"
   bastion_host_key_pair      = module.keypair.key_pair_name
   create_dns_record          = "false"

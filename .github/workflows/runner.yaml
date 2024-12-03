@@ -39,8 +39,9 @@ jobs:
         go-version: '1.23.x'
     - name: Install dependencies
       run: go get ./cmd/loadgen/
-    # - name: Unit Test 
-    #   run: go test -v -cover ./...
+    - name: Unit Test 
+      run: go test -v -cover ./...
+      run: ls -la
     
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1

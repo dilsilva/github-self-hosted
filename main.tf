@@ -85,7 +85,7 @@ module "vpc" {
 
 module "bastion" {
   source                     = "Guimove/bastion/aws"
-  bastion_ami                = "ami-0e9085e60087ce171"
+  bastion_ami                = var.ami_id
   bucket_name                = "${var.project}-bastion-bucket"
   region                     = var.region
   vpc_id                     = module.vpc.vpc_id

@@ -31,7 +31,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
       with: 
-        repository: 'https://github.com/dilsilva/go-load-generator/'
+        repository: 'dilsilva/go-load-generator/'
 
     - name: Setup Go
       uses: actions/setup-go@v5

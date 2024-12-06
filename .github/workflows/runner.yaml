@@ -60,10 +60,10 @@ jobs:
       run: |
 
         # Build the Docker image using the specified tags
-        sudo docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
 
         # Push the Docker image to the ECR repository using Docker config from the workspace
-        sudo docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
 
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
@@ -84,7 +84,7 @@ jobs:
       run: |
 
         # Push the Docker image to the ECR repository using Docker config from the workspace
-        sudo docker push ${{ steps.build-image.outputs.image }}
+        docker push ${{ steps.build-image.outputs.image }}
 
 
 

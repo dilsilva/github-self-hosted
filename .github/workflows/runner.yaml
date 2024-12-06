@@ -53,7 +53,7 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
-        ECR_REGISTRY: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
+        ECR_REGISTRY:  ${{ secrets.ECR_REGISTRY }}
         ECR_REPOSITORY: go-app
         IMAGE_TAG: ${{ github.sha }}
       run: |

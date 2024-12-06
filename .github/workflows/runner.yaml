@@ -1,16 +1,3 @@
-# name: do-the-job
-# on: push
-# jobs:
-#   do-the-job:
-#     name: Do the job on the runner
-#     runs-on: self-hosted
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Hello World
-#         run: |
-#           echo 'Hello World!'
-#           sleep 15
-#           echo 'Goodbye!'
 name: Deploy to ECR
 
 on: push
@@ -79,8 +66,7 @@ jobs:
       run: |
 
         # Push the Docker image to the ECR repository using Docker config from the workspace
-        docker push ${{ steps.build-image.outputs.image }}
-
+        sudo docker push ${{ steps.build-image.outputs.image }}
 
       #Insert Sign Image verification step before deployment
     - name: Download task definition

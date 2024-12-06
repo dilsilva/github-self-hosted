@@ -25,9 +25,9 @@ jobs:
       - name: Install dependencies
         run: go get ./cmd/loadgen/
       - name: Build
-        run: go build -v ./...
+        run: go build -o loadgen -ldflags="-s -w" ./cmd/loadgen/
       - name: Test with the Go CLI
-        run: go test
+        run: go test -v -cover ./... 
 
 
       - name: Build and tag image

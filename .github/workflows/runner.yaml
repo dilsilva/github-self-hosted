@@ -39,9 +39,9 @@ jobs:
         go-version: '1.23.x'
     - name: Install dependencies
       run: go get ./cmd/loadgen/ && ls -la
-    # - name: Unit Test 
-    #   run: go test -v -cover ./... 
-        - name: Configure AWS credentials
+    - name: Unit Test 
+      run: go test -v -cover ./... 
+    - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -81,7 +81,7 @@ jobs:
     - name: Download task definition
       run: |
         aws ecs describe-task-definition --task-definition my-task-definition-family --query taskDefinition > task-definition.json
-        
+
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1

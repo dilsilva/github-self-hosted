@@ -66,7 +66,7 @@ jobs:
       run: |
 
         # Push the Docker image to the ECR repository using Docker config from the workspace
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
 
       #Insert Sign Image verification step before deployment
     - name: Download task definition

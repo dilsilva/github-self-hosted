@@ -68,7 +68,7 @@ jobs:
 
       - name: Download task definition
         run: |
-          aws ecs describe-task-definition --task-definition ecs-sample --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition --task-definition web --query taskDefinition > task-definition.json
           cat task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
@@ -76,13 +76,13 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: ecs-sample
-          image: public.ecr.aws/aws-containers/ecsdemo-frontend:776fd50
+          container-name: nginx
+          image: nginx/nginx
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ecs-sample
+          service: cicdsvc 
           cluster: cicdtest
           wait-for-service-stability: true

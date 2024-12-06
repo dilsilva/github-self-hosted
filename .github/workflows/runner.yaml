@@ -49,7 +49,7 @@ jobs:
       id: login-ecr
       run: |
         # Get the ECR login password and use it to log in to the ECR registry
-        sudo result=$(aws ecr get-login-password --region $AWS_REGION | docker login --config ${GITHUB_WORKSPACE}/${GITHUB_RUN_ID} --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com)
+        result=$(aws ecr get-login-password --region $AWS_REGION | docker login --config ${GITHUB_WORKSPACE}/${GITHUB_RUN_ID} --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com)
         
     - name: Build, tag, and push image to Amazon ECR
       env:

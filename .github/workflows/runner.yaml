@@ -37,6 +37,10 @@ jobs:
       # Build and tag  
     - name: Build and tag image
       id: build-image
+      env:
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+        ECR_REPOSITORY: go-app
+        TAG_COMMIT: ${{ github.sha }}
       run: |
 
         # Build the Docker image using the specified tags

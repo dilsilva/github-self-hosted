@@ -73,7 +73,6 @@ jobs:
         # Push the Docker image to the ECR repository 
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
 
-      #Insert Sign Image verification step before deployment
     - name: Download task definition
       run: |
         aws ecs describe-task-definition --task-definition web --query taskDefinition > task-definition.json

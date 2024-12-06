@@ -4,7 +4,7 @@ on: push
 env:
   AWS_REGION: eu-west-1
   AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
-  ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com/go-app
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT }}.dkr.ecr.eu-west-1.amazonaws.com
   ECR_REPOSITORY: go-app
 
 jobs:

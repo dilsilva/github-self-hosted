@@ -61,7 +61,7 @@ jobs:
       run: |
         # Get the ECR login password and use it to log in to the ECR registry
         #result=$(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com)
-        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
+        echo $(aws ecr get-login-password --region $AWS_REGION)|docker login --password-stdin --username AWS $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
     - name: Push image to Amazon ECR
       id: push-image
       env:

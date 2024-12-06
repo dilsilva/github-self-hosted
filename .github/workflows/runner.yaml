@@ -4,6 +4,10 @@ on: push
 env:
   AWS_REGION: eu-west-1
   AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  TAG_COMMIT: ${{ github.sha }}
+  ECR_REPOSITORY: go-app
+
 jobs:
   build:
     name: CI
@@ -41,10 +45,6 @@ jobs:
       # Build and tag  
     - name: Build and tag image to Amazon ECR
       id: build-image
-      env:
-        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-        ECR_REPOSITORY: go-app
-        TAG_COMMIT: ${{ github.sha }} 
       run: |
 
         # Build the Docker image using the specified tags
@@ -63,10 +63,6 @@ jobs:
 
     - name: Push image to Amazon ECR
       id: push-image
-      env:
-        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-        ECR_REPOSITORY: go-app
-        TAG_COMMIT: ${{ github.sha }} 
       run: |
 
         # Push the Docker image to the ECR repository using Docker config from the workspace

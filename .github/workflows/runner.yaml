@@ -63,7 +63,6 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
-    #Insert vulnerability scan after build
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
       with:

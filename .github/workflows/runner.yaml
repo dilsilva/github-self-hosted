@@ -45,11 +45,11 @@ jobs:
         aws-region: us-east-2
 
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      run: |
-        # Get the ECR login password and use it to log in to the ECR registry
-        result=$(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com)
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   run: |
+    #     # Get the ECR login password and use it to log in to the ECR registry
+    #     result=$(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com)
         
     - name: Build, tag, and push image to Amazon ECR
       env:
@@ -57,6 +57,9 @@ jobs:
         ECR_REPOSITORY: go-app
         TAG_COMMIT: ${{ github.sha }} 
       run: |
+
+        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
+        
         # Build the Docker image using the specified tags
         sudo docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
 

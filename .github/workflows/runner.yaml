@@ -65,7 +65,7 @@ jobs:
         sudo docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
 
         # Remove the Docker config file after pushing the image
-        sudo rm -fr ${GITHUB_WORKSPACE}/${GITHUB_RUN_ID}/config.json
+        sudo rm -fr config.json
 
         $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT >> $GITHUB_OUTPUT
 

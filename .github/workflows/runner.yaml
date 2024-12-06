@@ -5,8 +5,8 @@ env:
   AWS_REGION: eu-west-1
   AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
   ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-  TAG_COMMIT: ${{ github.sha }}
   ECR_REPOSITORY: go-app
+  TAG_COMMIT: ${{ github.sha }}
 
 jobs:
   build:
@@ -65,7 +65,9 @@ jobs:
       id: push-image
       run: |
 
-        # Push the Docker image to the ECR repository using Docker config from the workspace
+        # Push the Docker image to the ECR repository 
+        echo "$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT"
+        echo "${{ steps.build-image.outputs.image }}"
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
 
       #Insert Sign Image verification step before deployment

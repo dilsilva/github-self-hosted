@@ -1,6 +1,11 @@
 name: Deploy to ECR
 
 on: push
+env:
+  AWS_ACCOUNT: 061051224299
+  AWS_REGION: eu-west-1
+  ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com
+  ECR_REPOSITORY: go-app
 
 jobs:
   build:
@@ -60,9 +65,9 @@ jobs:
       run: |
           # Get the ECR login password and use it to log in to the ECR registry
           aws ecr get-login-password \
-                  --region $AWS_REGION | docker login \
+                  --region 061051224299 | docker login \
                   --username AWS \
-                  --password-stdin $ECR_REGISTRY
+                  --password-stdin 061051224299.dkr.ecr.eu-west-1.amazonaws.com
     - name: Push image
       id: push-image
       env:

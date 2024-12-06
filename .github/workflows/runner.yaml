@@ -63,6 +63,7 @@ jobs:
 
         # Push the Docker image to the ECR repository using Docker config from the workspace
         sudo docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
+
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
 
@@ -89,7 +90,7 @@ jobs:
       with:
         task-definition: task-definition.json
         container-name: my-container
-          image: ${{ steps.build-image.outputs.image }}
+        image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v2

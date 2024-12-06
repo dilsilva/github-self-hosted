@@ -23,9 +23,6 @@ jobs:
     name: CI
     runs-on: self-hosted
     steps:
-    - name: Set short git commit SHA
-      id: commit
-      uses: prompt/actions-commit-hash@v2
 
   # Checkout and test app code
     - name: Check out code

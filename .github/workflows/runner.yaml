@@ -59,7 +59,7 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Build the Docker image using the specified tags
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
+        sudo docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
 
         # Push the Docker image to the ECR repository using Docker config from the workspace
         sudo docker --config ${GITHUB_WORKSPACE}/${GITHUB_RUN_ID} push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT

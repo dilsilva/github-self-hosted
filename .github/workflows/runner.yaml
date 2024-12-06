@@ -23,7 +23,7 @@ jobs:
     runs-on: self-hosted
     steps:
 
-# Checkout and test app code
+      # Checkout and test app code
     - name: Check out code
       uses: actions/checkout@v2
       with: 
@@ -44,14 +44,14 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
 
-# Registry authentication
+      # Registry authentication
     - name: Login to Amazon ECR
       id: login-ecr
       run: |
         # Get the ECR login password and use it to log in to the ECR registry
         result=$(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com)
 
-# Build and tag  
+      # Build and tag  
     - name: Build and tag image to Amazon ECR
       id: build-image
       env:
@@ -64,7 +64,7 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
-# Security Testing
+      # Security Testing
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
       with:
@@ -89,7 +89,7 @@ jobs:
 
 
 
-#Insert Sign Image verification step before deployment
+      #Insert Sign Image verification step before deployment
     - name: Download task definition
       run: |
         aws ecs describe-task-definition --task-definition web --query taskDefinition > task-definition.json

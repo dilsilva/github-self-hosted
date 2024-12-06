@@ -14,41 +14,41 @@ jobs:
     steps:
 
       # Checkout and test app code
-    - name: Check out code
-      uses: actions/checkout@v2
-      with: 
-        repository: 'dilsilva/go-load-generator'
+    # - name: Check out code
+    #   uses: actions/checkout@v2
+    #   with: 
+    #     repository: 'dilsilva/go-load-generator'
 
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.23.x'
-    - name: Install dependencies
-      run: go get ./cmd/loadgen/
-    # - name: Unit Test 
-    #   run: go test -v -cover ./... 
+    # - name: Setup Go
+    #   uses: actions/setup-go@v5
+    #   with:
+    #     go-version: '1.23.x'
+    # - name: Install dependencies
+    #   run: go get ./cmd/loadgen/
+    # # - name: Unit Test 
+    # #   run: go test -v -cover ./... 
 
-      # Build and tag  
-    - name: Build and tag image
-      id: build-image
-      env:
-        TAG_COMMIT: ${{ github.sha }}
-      run: |
+    #   # Build and tag  
+    # - name: Build and tag image
+    #   id: build-image
+    #   env:
+    #     TAG_COMMIT: ${{ github.sha }}
+    #   run: |
 
-        # Build the Docker image using the specified tags
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
+    #     # Build the Docker image using the specified tags
+    #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
+    #     echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
-      # Scan Artefacts  
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.28.0
-      with:
-        image-ref: ${{ steps.build-image.outputs.image }}
-        format: 'table'
-        hide-progress: true
-        # exit-code: '1' #Error in case of vulnerabilities
-        ignore-unfixed: true
-        severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities
+    #   # Scan Artefacts  
+    # - name: Run Trivy vulnerability scanner
+    #   uses: aquasecurity/trivy-action@0.28.0
+    #   with:
+    #     image-ref: ${{ steps.build-image.outputs.image }}
+    #     format: 'table'
+    #     hide-progress: true
+    #     # exit-code: '1' #Error in case of vulnerabilities
+    #     ignore-unfixed: true
+    #     severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1

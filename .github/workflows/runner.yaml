@@ -64,7 +64,6 @@ jobs:
         # Push the Docker image to the ECR repository using Docker config from the workspace
         sudo docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
 
-        $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT >> $GITHUB_OUTPUT
 
 
     #Insert vulnerability scan after build

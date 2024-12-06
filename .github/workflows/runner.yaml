@@ -12,10 +12,10 @@ jobs:
     name: CI
     runs-on: self-hosted
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
-      with: 
-        repository: 'dilsilva/go-load-generator'
+      - name: Check out code
+        uses: actions/checkout@v2
+        with: 
+          repository: 'dilsilva/go-load-generator'
 
 #####
 ## Build and test Go binary

@@ -27,14 +27,6 @@ jobs:
       run: go get ./cmd/loadgen/
     # - name: Unit Test 
     #   run: go test -v -cover ./... 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-
-      # Registry authentication
 
       # Build and tag  
     - name: Build and tag image
@@ -53,10 +45,17 @@ jobs:
       with:
         image-ref: ${{ steps.build-image.outputs.image }}
         format: 'table'
+        hide-progress: true
         # exit-code: '1' #Error in case of vulnerabilities
         ignore-unfixed: true
         severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities
 
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
     - name: Login to Amazon ECR
       id: login-ecr
       run: |

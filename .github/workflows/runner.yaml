@@ -14,10 +14,10 @@ jobs:
     steps:
 
       # Checkout and test app code
-    # - name: Check out code
-    #   uses: actions/checkout@v2
-    #   with: 
-    #     repository: 'dilsilva/go-load-generator'
+    - name: Check out code
+      uses: actions/checkout@v2
+      with: 
+        repository: 'dilsilva/go-load-generator'
 
     # - name: Setup Go
     #   uses: actions/setup-go@v5
@@ -28,16 +28,16 @@ jobs:
     # # - name: Unit Test 
     # #   run: go test -v -cover ./... 
 
-    #   # Build and tag  
-    # - name: Build and tag image
-    #   id: build-image
-    #   env:
-    #     TAG_COMMIT: ${{ github.sha }}
-    #   run: |
+      # Build and tag  
+    - name: Build and tag image
+      id: build-image
+      env:
+        TAG_COMMIT: ${{ github.sha }}
+      run: |
 
-    #     # Build the Docker image using the specified tags
-    #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
-    #     echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
+        # Build the Docker image using the specified tags
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
     #   # Scan Artefacts  
     # - name: Run Trivy vulnerability scanner

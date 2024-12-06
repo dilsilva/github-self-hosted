@@ -13,12 +13,11 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with: 
           repository: 'dilsilva/go-load-generator'
 
-#####
-## Build and test Go binary
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -30,71 +29,65 @@ jobs:
       - name: Test with the Go CLI
         run: go test
 
-#####
-## Build and tag image
-    - name: Build and tag image
-      id: build-image
-      env:
-        TAG_COMMIT: ${{ github.sha }}
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
-#####
-## Scan image for security flaws
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.28.0
-      with:
-        image-ref: ${{ steps.build-image.outputs.image }}
-        format: 'table'
-        hide-progress: true
-        # exit-code: '1' #Error in case of vulnerabilities
-        ignore-unfixed: true
-        severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities 
+      - name: Build and tag image
+        id: build-image
+        env:
+          TAG_COMMIT: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ steps.build-image.outputs.image }}
+          format: 'table'
+          hide-progress: true
+          # exit-code: '1' #Error in case of vulnerabilities
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities 
 
 
-#####
-## Push the Docker image to the ECR repository 
-    - name: Login to ECR
-      id: login-ecr
-      env:
-        AWS_ACCOUNT: 061051224299
-        AWS_REGION: eu-west-1
-      run: |
-          # Get the ECR login password and use it to log in to the ECR registry
-          aws ecr get-login-password \
-                  --region $AWS_REGION | docker login \
-                  --username AWS \
-                  --password-stdin $ECR_REGISTRY
 
-    - name: Push image
-      id: push-image
-      env:
-        TAG_COMMIT: ${{ github.sha }}
-      run: |
-        docker push ${{ steps.build-image.outputs.image }}
-        # docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
+      - name: Login to ECR
+        id: login-ecr
+        env:
+          AWS_ACCOUNT: 061051224299
+          AWS_REGION: eu-west-1
+        run: |
+            # Get the ECR login password and use it to log in to the ECR registry
+            aws ecr get-login-password \
+                    --region $AWS_REGION | docker login \
+                    --username AWS \
+                    --password-stdin $ECR_REGISTRY
 
-#####
-## Deploy image to ECS
-    - name: Download task definition
-      run: |
-        aws ecs describe-task-definition --task-definition web --query taskDefinition > task-definition.json
-        cat task-definition.json
+      - name: Push image
+        id: push-image
+        env:
+          TAG_COMMIT: ${{ github.sha }}
+        run: |
+          docker push ${{ steps.build-image.outputs.image }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: task-definition.json
-        container-name: nginx
-        # image: ${{ steps.build-image.outputs.image }}
-        image: public.ecr.aws/nginx/nginx:alpine-slim
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: cicdsvc
-        cluster: cicdtest
-        wait-for-service-stability: true
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition web --query taskDefinition > task-definition.json
+          cat task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: nginx
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: cicdsvc
+          cluster: cicdtest
+          wait-for-service-stability: true

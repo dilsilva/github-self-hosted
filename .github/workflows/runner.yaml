@@ -4,9 +4,6 @@ on: push
 env:
   AWS_REGION: eu-west-1
   AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
-  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-  ECR_REPOSITORY: go-app
-  TAG_COMMIT: ${{ github.sha }}
 
 jobs:
   build:
@@ -64,6 +61,10 @@ jobs:
 
     - name: Push image to Amazon ECR
       id: push-image
+      env:
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+        ECR_REPOSITORY: go-app
+        TAG_COMMIT: ${{ github.sha }}
       run: |
 
         # Push the Docker image to the ECR repository 

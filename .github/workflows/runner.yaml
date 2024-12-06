@@ -64,7 +64,6 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT .
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
-      # Security Testing
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
       with:
@@ -79,14 +78,12 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-
     - name: Push image to Amazon ECR
       id: push-image
       run: |
 
         # Push the Docker image to the ECR repository using Docker config from the workspace
         docker push ${{ steps.build-image.outputs.image }}
-
 
 
       #Insert Sign Image verification step before deployment

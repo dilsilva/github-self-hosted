@@ -73,10 +73,6 @@ jobs:
         # exit-code: '1' #Error in case of vulnerabilities
         ignore-unfixed: true
         severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: 'trivy-results.sarif'
 
     - name: Push image to Amazon ECR
       id: push-image

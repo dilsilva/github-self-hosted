@@ -24,8 +24,6 @@ jobs:
           go-version: '1.23.x'
       - name: Install dependencies
         run: go get ./cmd/loadgen/
-      - name: Build
-        run: go build -o loadgen -ldflags="-s -w" ./cmd/loadgen/
       - name: Test with the Go CLI
         run: go test -v -cover ./... 
 

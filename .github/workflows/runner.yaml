@@ -72,7 +72,7 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
       with:
-        image-ref: ${{ steps.login-ecr.outputs.registry }}
+        image-ref: ${{ steps.build-image.outputs.image }}
         format: 'table'
         exit-code: '1'
         ignore-unfixed: true
@@ -83,7 +83,7 @@ jobs:
     # #Insert Sign Image verification step before deployment
     - name: Download task definition
       run: |
-        aws ecs describe-task-definition --task-definition my-task-definition-family --query taskDefinition > task-definition.json
+        aws ecs describe-task-definition --task-definition web --query taskDefinition > task-definition.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
@@ -97,7 +97,6 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v2
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: my-service
-        cluster: my-cluster
+        service: cicdsvc
+        cluster: cicdtest
         wait-for-service-stability: true
-####

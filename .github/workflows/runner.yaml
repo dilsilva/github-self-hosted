@@ -70,5 +70,5 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: goserver 
-          cluster: surepay-ecs
+          cluster: cicdtest-ecs
           wait-for-service-stability: true

@@ -22,6 +22,7 @@ jobs:
         run: |
           cd app/
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT . 
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT $ECR_REGISTRY/$ECR_REPOSITORY:latest  
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
       # # - name: Run Trivy vulnerability scanner
@@ -48,7 +49,7 @@ jobs:
           TAG_COMMIT: ${{ github.sha }}
         run: |
           docker push ${{ steps.build-image.outputs.image }}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           sudo rm /root/.docker/config.json
 
       - name: Download task definition
@@ -69,5 +70,5 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: cicdsvc 
-          cluster: cicdtest
+          cluster: surepay-ecs
           wait-for-service-stability: true

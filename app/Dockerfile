@@ -8,7 +8,7 @@ func main() {
    app := gin.Default()
    router := app.Group("/")
    router.GET("/", Hello)
-   app.Run(":8080")
+   app.Run(":80")
 }
 func Hello(c *gin.Context) {
   c.Writer.Write([]byte("<h1> hello k8s </h1>"))

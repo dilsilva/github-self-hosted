@@ -12,27 +12,27 @@ jobs:
     name: CI
     runs-on: self-hosted
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+      # - name: Check out code
+      #   uses: actions/checkout@v4
 
-      - name: Build and tag image
-        id: build-image
-        env:
-          TAG_COMMIT: ${{ github.sha }}
-        run: |
-          cd app/
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT . 
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
+      # - name: Build and tag image
+      #   id: build-image
+      #   env:
+      #     TAG_COMMIT: ${{ github.sha }}
+      #   run: |
+      #     cd app/
+      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT . 
+      #     echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ steps.build-image.outputs.image }}
-          format: 'table'
-          hide-progress: true
-          # exit-code: '1' #Error in case of vulnerabilities
-          ignore-unfixed: true
-          severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities 
+      # # - name: Run Trivy vulnerability scanner
+      # #   uses: aquasecurity/trivy-action@0.28.0
+      # #   with:
+      # #     image-ref: ${{ steps.build-image.outputs.image }}
+      # #     format: 'table'
+      # #     hide-progress: true
+      # #     # exit-code: '1' #Error in case of vulnerabilities
+      # #     ignore-unfixed: true
+      # #     severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities 
 
       - name: Login to ECR
         id: login-ecr
@@ -40,11 +40,7 @@ jobs:
           AWS_ACCOUNT: 061051224299
           AWS_REGION: eu-west-1
         run: |
-            # Get the ECR login password and use it to log in to the ECR registry
-            aws ecr get-login-password \
-                    --region $AWS_REGION | docker login \
-                    --username AWS \ 
-                    --password-stdin $ECR_REGISTRY
+            docker login -u AWS -p $(aws ecr get-login-password --region $AWS_REGION) $ECR_REGISTRY
 
       - name: Push image
         id: push-image

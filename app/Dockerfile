@@ -18,5 +18,6 @@ RUN ls
 RUN go mod init server
 RUN go mod tidy
 RUN go build -o hello
+EXPOSE 80
 
 CMD ["/src/hello"]

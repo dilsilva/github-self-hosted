@@ -12,17 +12,17 @@ jobs:
     name: CI
     runs-on: self-hosted
     steps:
-      # - name: Check out code
-      #   uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v4
 
-      # - name: Build and tag image
-      #   id: build-image
-      #   env:
-      #     TAG_COMMIT: ${{ github.sha }}
-      #   run: |
-      #     cd app/
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT . 
-      #     echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
+      - name: Build and tag image
+        id: build-image
+        env:
+          TAG_COMMIT: ${{ github.sha }}
+        run: |
+          cd app/
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT . 
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
       # # - name: Run Trivy vulnerability scanner
       # #   uses: aquasecurity/trivy-action@0.28.0
@@ -49,6 +49,7 @@ jobs:
         run: |
           docker push ${{ steps.build-image.outputs.image }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT
+          sudo rm /root/.docker/config.json
 
       - name: Download task definition
         run: |

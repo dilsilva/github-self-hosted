@@ -19,8 +19,6 @@ module "vpc" {
   manage_default_route_table      = false
   manage_default_security_group   = false
 
-
-
   default_vpc_tags = merge(
     var.default_tags, {
       Name = "vpc"
@@ -28,81 +26,58 @@ module "vpc" {
   )
 }
 
-# module "runner" {
-#   source = "./modules/runner"
+module "runner" {
+  source     = "./modules/runner"
+  runner_ami = var.ami_id
+  region     = var.region
 
-#   vpc_id    = module.vpc.vpc_id
-#   subnet_id = tostring(module.vpc.public_subnets[0])
-#   key_pair_name = module.keypair.key_pair_name
+  instance_type = var.instance_type
 
-#   ami_id               = var.ami_id
-#   runner_instance_type = "t2.micro"
-
-#   default_tags = merge(
-#     var.default_tags, {
-#       Name = "gh-runner"
-#     },
-#   )
-# }
-
-# module "eks" {
-#   source  = "terraform-aws-modules/eks/aws"
-#   version = "~> 20.0"
-
-#   cluster_name    = "${var.project}-al2023"
-#   cluster_version = "1.31"
-
-#   # EKS Addons
-#   cluster_addons = {
-#     coredns                = {}
-#     eks-pod-identity-agent = {}
-#     kube-proxy             = {}
-#     vpc-cni                = {}
-#   }
-
-#   vpc_id     = module.vpc.vpc_id
-#   subnet_ids = module.vpc.public_subnets
-
-#   eks_managed_node_groups = {
-#     main = {
-#       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-#       instance_types = [var.instance_type]
-
-#       min_size = 1
-#       max_size = 3
-#       # This value is ignored after the initial creation
-#       # https://github.com/bryantbiggs/eks-desired-size-hack
-#       desired_size = 1
-#     }
-#   }
-
-#   tags = merge(
-#     var.default_tags, {
-#       Name = "eks"
-#     },
-#   )
-# }
-
-module "bastion" {
-  source                     = "Guimove/bastion/aws"
-  bastion_ami                = var.ami_id
-  bucket_name                = "${var.project}-bastion-bucket"
-  region                     = var.region
-  vpc_id                     = module.vpc.vpc_id
-  instance_type              = var.instance_type
+  aws_ecs_service_name       = module.ecs.service_name
+  aws_ecs_cluster_name       = module.ecs.cluster_name
   is_lb_private              = "false"
-  bastion_host_key_pair      = module.keypair.key_pair_name
+  runner_host_key_pair       = module.suplement.key_pair_name
+  runner_iam_policy_name     = "${var.project}RunnerHostPolicy"
   create_dns_record          = "false"
-  bastion_iam_policy_name    = "${var.project}BastionHostPolicy"
-  elb_subnets                = [module.vpc.public_subnets[0], module.vpc.public_subnets[1]]
-  auto_scaling_group_subnets = [module.vpc.public_subnets[0], module.vpc.public_subnets[1]]
+  vpc_id                     = module.vpc.vpc_id
+  elb_subnets                = module.vpc.public_subnets
+  auto_scaling_group_subnets = module.vpc.private_subnets
+  ipv4_cidr_block            = flatten([module.vpc.private_subnets_cidr_blocks, "0.0.0.0/0"])
+
+  github_url           = "https://github.com/dilsilva/surepay/settings/actions/runners"
+  github_owner         = "dilsilva"
+  github_repo          = "surepay"
+  ssm_parameter_name   = module.suplement.ssm_parameter_name
+  github_runner_group  = ""
+  github_runner_labels = ""
+
   tags = merge(
     var.default_tags, {
-      "name" = "${var.project}-bastion"
+      "name" = "${var.project}-runner"
   }, )
+
+  depends_on = [module.vpc]
 }
 
-module "keypair" {
-  source  = "./modules/keypair"
-  project = var.project
+
+module "ecs" {
+  source = "./modules/ecs"
+
+  project         = var.project
+  region          = var.region
+  vpc_id          = module.vpc.vpc_id
+  public_subnets  = module.vpc.public_subnets
+  private_subnets = module.vpc.private_subnets
+  app_name        = var.app_name
+  app_image       = module.suplement.ecr_repository
+
+  depends_on = [module.vpc]
+}
+
+module "suplement" {
+  source     = "./modules/suplement"
+  project    = var.project
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJaDTgLeCoQqvOD2Hbityz0WD+/jmLY7Wpy4Zmu81S2ejbSiU2AHAZil0KhCJzMDtoZfhbsntRCU1i5tIVnCyT1XOptMXrMn3h8LqVHjc7KqMZkOnPHFjUm/JBgAsxyM4NOVIgLykH4QRotRCBtMhjPWwDfpdgrlFciEmq6NEiyVkNRWT2RJ2FV9JqD15vs9i3Q/whmR6nbqb7o5HCPRz6s2wkQonsjP16v+MpPZjFswGMJxcsL4ZcKN4bvsElhwYVGDSS1R6Z4cn/CSU8bluRPIHWUSEZsW9vME7h32j2v79qBp5I8ACJbyQC2VstoHRWSOoVt/sQE3gLjGBd+goi7sQCHDVQnhstSPuxZOdEuxGDANSEyyo7TCiZrfRVZqcDtmUi1WmTkAzpvFjQYZT8hwIxsVbp2VG3tP6UwH3DH8ofxd6eIOvH27bxlbwzbOAkNG9/rwT4kGfyZZ2D8R9aH9PFXeeohiQkJegyRzzIWzHhxtL2v5i2Mxcbtnhj/kdzK0GUUymDjO3LK7+UW4kGEKCX/KxuuWWsrlrKPTMZu1x3nsDJD+gUgC33GOkY7zO0hSj4kXVxpPN+Q5RngNB9rHF7RPRMuS7TCF0V6ZfTRh9Q6DNDrGOrzlLmJj2yA0vB/V2rsLRA/TXVpTlE91/j/1vxsIFuZ99NspCUwbBABw== dilsilva.diego@gmail.com"
+  pat_value  = "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"
+  app_name   = var.app_name
 }

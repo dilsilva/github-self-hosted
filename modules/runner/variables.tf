@@ -185,12 +185,6 @@ variable "vpc_id" {
   description = "VPC ID where we'll deploy the runner"
 }
 
-# variable "ipv4_cidr_block" {
-#   type        = list(string)
-#   default     = [""]
-#   description = "List of ipv4 CIDR blocks from the subnet"
-# }
-
 variable "github_url" {
   type        = string
   default     = ""

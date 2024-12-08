@@ -30,11 +30,9 @@ No modules.
 | [aws_security_group.lb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.private_instances_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.runner_host_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group_rule.all_egress_lb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.egress_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.ingress_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.lb_runner_ssh](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.shh_lb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.ingress_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_ami.ubuntu-linux-2404](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.assume_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -44,7 +42,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_associate_public_ip_address"></a> [associate\_public\_ip\_address](#input\_associate\_public\_ip\_address) | n/a | `bool` | `false` | no |
+| <a name="input_associate_public_ip_address"></a> [associate\_public\_ip\_address](#input\_associate\_public\_ip\_address) | n/a | `bool` | `true` | no |
 | <a name="input_auto_scaling_group_subnets"></a> [auto\_scaling\_group\_subnets](#input\_auto\_scaling\_group\_subnets) | List of subnets where the Auto Scaling Group will deploy the instances | `list(string)` | n/a | yes |
 | <a name="input_aws_ecs_cluster_name"></a> [aws\_ecs\_cluster\_name](#input\_aws\_ecs\_cluster\_name) | Name of the ECS Cluster where the operations gonna be executed | `string` | `""` | no |
 | <a name="input_aws_ecs_service_name"></a> [aws\_ecs\_service\_name](#input\_aws\_ecs\_service\_name) | Name of the ECS service where the operations gonna be executed | `string` | `""` | no |
@@ -64,20 +62,19 @@ No modules.
 | <a name="input_http_endpoint"></a> [http\_endpoint](#input\_http\_endpoint) | Whether the metadata service is available | `bool` | `true` | no |
 | <a name="input_http_put_response_hop_limit"></a> [http\_put\_response\_hop\_limit](#input\_http\_put\_response\_hop\_limit) | The desired HTTP PUT response hop limit for instance metadata requests | `number` | `1` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Instance size of the runner | `string` | `"t3.nano"` | no |
-| <a name="input_ipv4_cidr_block"></a> [ipv4\_cidr\_block](#input\_ipv4\_cidr\_block) | List of ipv4 CIDR blocks from the subnet | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_is_lb_private"></a> [is\_lb\_private](#input\_is\_lb\_private) | If TRUE, the load balancer scheme will be "internal" else "internet-facing" | `bool` | `null` | no |
 | <a name="input_private_ssh_port"></a> [private\_ssh\_port](#input\_private\_ssh\_port) | Set the SSH port to use between the runner and private instance | `number` | `22` | no |
 | <a name="input_project"></a> [project](#input\_project) | Name of the project | `string` | `"surepay"` | no |
 | <a name="input_public_ssh_port"></a> [public\_ssh\_port](#input\_public\_ssh\_port) | Set the SSH port to use from desktop to the runner | `number` | `22` | no |
-| <a name="input_region"></a> [region](#input\_region) | n/a | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | Region of the project | `string` | n/a | yes |
 | <a name="input_runner_additional_security_groups"></a> [runner\_additional\_security\_groups](#input\_runner\_additional\_security\_groups) | List of additional security groups to attach to the launch template | `list(string)` | `[]` | no |
 | <a name="input_runner_ami"></a> [runner\_ami](#input\_runner\_ami) | The AMI that the runner Host will use. | `string` | `""` | no |
 | <a name="input_runner_host_key_pair"></a> [runner\_host\_key\_pair](#input\_runner\_host\_key\_pair) | Select the key pair to use to launch the runner host | `string` | n/a | yes |
 | <a name="input_runner_iam_policy_name"></a> [runner\_iam\_policy\_name](#input\_runner\_iam\_policy\_name) | IAM policy name to create for granting the instance role access to the bucket | `string` | `"runnerHost"` | no |
 | <a name="input_runner_iam_role_name"></a> [runner\_iam\_role\_name](#input\_runner\_iam\_role\_name) | IAM role name to create | `string` | `"runnerRole"` | no |
-| <a name="input_runner_instance_count"></a> [runner\_instance\_count](#input\_runner\_instance\_count) | n/a | `number` | `1` | no |
-| <a name="input_runner_instance_count_max"></a> [runner\_instance\_count\_max](#input\_runner\_instance\_count\_max) | n/a | `number` | `3` | no |
-| <a name="input_runner_instance_count_min"></a> [runner\_instance\_count\_min](#input\_runner\_instance\_count\_min) | n/a | `number` | `1` | no |
+| <a name="input_runner_instance_count"></a> [runner\_instance\_count](#input\_runner\_instance\_count) | Expected number of instances running on the cluster | `number` | `1` | no |
+| <a name="input_runner_instance_count_max"></a> [runner\_instance\_count\_max](#input\_runner\_instance\_count\_max) | Maximum expected number of instances running on the cluster | `number` | `3` | no |
+| <a name="input_runner_instance_count_min"></a> [runner\_instance\_count\_min](#input\_runner\_instance\_count\_min) | Minimun expected number of instances running on the cluster | `number` | `1` | no |
 | <a name="input_runner_launch_template_name"></a> [runner\_launch\_template\_name](#input\_runner\_launch\_template\_name) | runner Launch template Name, will also be used for the ASG | `string` | `"runner-lt"` | no |
 | <a name="input_runner_record_name"></a> [runner\_record\_name](#input\_runner\_record\_name) | DNS record name to use for the runner | `string` | `""` | no |
 | <a name="input_runner_security_group_id"></a> [runner\_security\_group\_id](#input\_runner\_security\_group\_id) | Custom security group to use | `string` | `""` | no |

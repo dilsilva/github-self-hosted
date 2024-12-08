@@ -1,6 +1,8 @@
 name: Terraform pipeline + docs
 on:
-  - pull_request
+  push:
+    branches:
+      - dev
 
 jobs:
   tf-pipe:

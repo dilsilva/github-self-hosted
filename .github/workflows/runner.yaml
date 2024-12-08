@@ -7,11 +7,9 @@ env:
   ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com
   ECR_REPOSITORY: go-app
 
-
-
 jobs:
   build:
-    name: CI
+    name: CICD
     runs-on: self-hosted
     steps:
       - name: Check out code
@@ -55,7 +53,7 @@ jobs:
 
       - name: Download task definition
         run: |
-          aws ecs describe-task-definition --task-definition surepay-task --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition --task-definition go-app --query taskDefinition > task-definition.json
           cat task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition

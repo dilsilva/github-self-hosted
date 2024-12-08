@@ -1,60 +1,73 @@
-name: do-the-job
-on: pull_request
+name: Deploy to ECR
+
+on: push
+env:
+  AWS_REGION: eu-west-1
+
 jobs:
-  start-runner:
-    name: Start self-hosted EC2 runner
-    runs-on: ubuntu-latest
-    outputs:
-      label: ${{ steps.start-ec2-runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+  build:
+    name: CICD
+    runs-on: self-hosted
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Build and tag image
+        id: build-image
+        env:
+          ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com
+          ECR_REPOSITORY: go-app
+          TAG_COMMIT: ${{ github.sha }}
+        run: |
+          cd app/
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT . 
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Start EC2 runner
-        id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2
+          image-ref: ${{ steps.build-image.outputs.image }}
+          format: 'table'
+          hide-progress: true
+          # exit-code: '1' #Error in case of vulnerabilities
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities 
+          cache: 'false'
+
+      - name: Login to ECR
+        id: login-ecr
+        env:
+          AWS_ACCOUNT: 061051224299
+          ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com
+        run: |
+            docker login -u AWS -p $(aws ecr get-login-password --region $AWS_REGION) $ECR_REGISTRY
+
+      - name: Push image
+        id: push-image
+        env:
+          TAG_COMMIT: ${{ github.sha }}
+        run: |
+          docker push ${{ steps.build-image.outputs.image }}
+          sudo rm /root/.docker/config.json
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition surepay-task --query taskDefinition > task-definition.json
+          cat task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          mode: start
-          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          ec2-image-id: ami-02141377eee7defb9
-          ec2-instance-type: t3.nano
-          subnet-id: subnet-0458f5906f3685c08
-          security-group-id: sg-035e60401f1ac532a
-          iam-role-name: runner_policy # optional, requires additional permissions
-          aws-resource-tags: > # optional, requires additional permissions
-            [
-              {"Key": "Name", "Value": "ec2-github-runner"},
-              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
-            ]
-  do-the-job:
-    name: Do the job on the runner
-    needs: start-runner # required to start the main job when the runner is ready
-    runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
-    steps:
-      - name: Hello World
-        run: echo 'Hello World!'
-  stop-runner:
-    name: Stop self-hosted EC2 runner
-    needs:
-      - start-runner # required to get output from the start-runner job
-      - do-the-job # required to wait when the main job is done
-    runs-on: ubuntu-latest
-    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+          task-definition: task-definition.json
+          container-name: go-app
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v2
-        with:
-          mode: stop
-          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          label: ${{ needs.start-runner.outputs.label }}
-          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: surepay-service 
+          cluster: surepay-ecs
+          desired-count: 4
+          wait-for-service-stability: true

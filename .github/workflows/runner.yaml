@@ -69,4 +69,5 @@ jobs:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: surepay-service 
           cluster: surepay-ecs
+          desired-count: 4
           wait-for-service-stability: true

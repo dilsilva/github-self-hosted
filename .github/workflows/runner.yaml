@@ -22,7 +22,6 @@ jobs:
         run: |
           cd app/
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT . 
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT 
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
       - name: Run Trivy vulnerability scanner

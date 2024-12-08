@@ -89,7 +89,7 @@ resource "aws_security_group_rule" "all_egress_lb" {
   from_port   = "0"
   to_port     = "65535"
   protocol    = "-1"
-  # cidr_blocks = ["0.0.0.0/0"]
+
   security_group_id        = aws_security_group.lb.id
   source_security_group_id = aws_security_group.runner_host_security_group.id
 }

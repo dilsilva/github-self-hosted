@@ -42,7 +42,6 @@ module "runner" {
   vpc_id                     = module.vpc.vpc_id
   elb_subnets                = module.vpc.public_subnets
   auto_scaling_group_subnets = module.vpc.private_subnets
-  ipv4_cidr_block            = flatten([module.vpc.private_subnets_cidr_blocks, "0.0.0.0/0"])
 
   github_url           = "https://github.com/dilsilva/surepay/settings/actions/runners"
   github_owner         = "dilsilva"

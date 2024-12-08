@@ -56,7 +56,7 @@ module "runner" {
       "name" = "${var.project}-runner"
   }, )
 
-  depends_on = [module.vpc]
+  depends_on = [module.vpc, module.suplement]
 }
 
 
@@ -70,6 +70,8 @@ module "ecs" {
   private_subnets = module.vpc.private_subnets
   app_name        = var.app_name
   app_image       = module.suplement.ecr_repository
+
+  private_instances_security_group = module.runner.private_instances_security_group
 
   depends_on = [module.vpc]
 }

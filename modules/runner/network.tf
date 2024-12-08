@@ -18,8 +18,8 @@ resource "aws_lb" "runner_lb" {
   internal = var.is_lb_private
   name     = "${var.project}-lb"
 
-  subnets = var.elb_subnets
-
+  subnets            = var.elb_subnets
+  security_groups    = [aws_security_group.lb.id]
   load_balancer_type = "network"
   tags               = merge(var.tags)
 
@@ -35,7 +35,7 @@ resource "aws_lb_target_group" "runner_lb_target_group" {
   count = var.create_elb ? 1 : 0
 
   name        = "${var.project}-lb-target"
-  port        = var.public_ssh_port
+  port        = 22
   protocol    = "TCP"
   vpc_id      = var.vpc_id
   target_type = "instance"
@@ -57,21 +57,13 @@ resource "aws_lb_listener" "runner_lb_listener_22" {
   }
 
   load_balancer_arn = aws_lb.runner_lb[0].arn
-  port              = var.public_ssh_port
+  port              = 22
   protocol          = "TCP"
 }
 
 #SGs
-resource "aws_security_group" "runner_host_security_group" {
-  count       = var.runner_security_group_id == "" ? 1 : 0
-  description = "Enable SSH access to the runner host from external via SSH port"
-  name        = "${var.project}-host"
-  vpc_id      = var.vpc_id
 
-  tags = merge(var.tags)
-}
-
-
+#LB
 resource "aws_security_group" "lb" {
   description = "Enable SSH access to LB via SSH port"
   name        = "${var.project}-ssh-lb"
@@ -80,20 +72,50 @@ resource "aws_security_group" "lb" {
   tags = merge(var.tags)
 }
 
-resource "aws_security_group_rule" "ingress_runner" {
-  count       = var.runner_security_group_id == "" && var.create_elb ? 1 : 0
+resource "aws_security_group_rule" "shh_lb" {
+  description = "Incoming traffic to LB"
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "TCP"
+
+  security_group_id = aws_security_group.lb.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "all_egress_lb" {
+  description = "Outgoing traffic from lb to runner"
+  type        = "egress"
+  from_port   = "0"
+  to_port     = "65535"
+  protocol    = "-1"
+  # cidr_blocks = ["0.0.0.0/0"]
+  security_group_id        = aws_security_group.lb.id
+  source_security_group_id = aws_security_group.runner_host_security_group.id
+}
+
+#runner
+resource "aws_security_group" "runner_host_security_group" {
+  description = "Enable SSH access to the runner host from lb"
+  name        = "${var.project}-runner"
+  vpc_id      = var.vpc_id
+
+  tags = merge(var.tags)
+}
+
+
+resource "aws_security_group_rule" "lb_runner_ssh" {
   description = "Incoming traffic to runner"
   type        = "ingress"
-  from_port   = var.public_ssh_port
-  to_port     = var.public_ssh_port
+  from_port   = 22
+  to_port     = 22
   protocol    = "TCP"
-  cidr_blocks = var.ipv4_cidr_block
 
-  security_group_id = local.security_group
+  security_group_id        = aws_security_group.runner_host_security_group.id
+  source_security_group_id = aws_security_group.lb.id
 }
 
 resource "aws_security_group_rule" "egress_runner" {
-  count       = var.runner_security_group_id == "" ? 1 : 0
   description = "Outgoing traffic from runner to instances"
   type        = "egress"
   from_port   = "0"
@@ -101,9 +123,11 @@ resource "aws_security_group_rule" "egress_runner" {
   protocol    = "-1"
   cidr_blocks = ["0.0.0.0/0"]
 
-  security_group_id = local.security_group
+  security_group_id = aws_security_group.runner_host_security_group.id
+  # source_security_group_id = aws_security_group.runner_host_security_group.id
 }
 
+#priv
 resource "aws_security_group" "private_instances_security_group" {
   description = "Enable SSH access to the Private instances from the runner via SSH port"
   name        = "${var.project}-priv-instances"
@@ -115,11 +139,10 @@ resource "aws_security_group" "private_instances_security_group" {
 resource "aws_security_group_rule" "ingress_instances" {
   description = "Incoming traffic from runner"
   type        = "ingress"
-  from_port   = var.private_ssh_port
-  to_port     = var.private_ssh_port
+  from_port   = 22
+  to_port     = 22
   protocol    = "TCP"
 
-  source_security_group_id = local.security_group
-
-  security_group_id = aws_security_group.private_instances_security_group.id
+  security_group_id        = aws_security_group.private_instances_security_group.id
+  source_security_group_id = aws_security_group.runner_host_security_group.id
 }

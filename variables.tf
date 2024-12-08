@@ -45,7 +45,7 @@ variable "azs" {
 #Runner
 variable "ami_id" {
   default = "ami-0e9085e60087ce171" #Ubuntu
-  type = string
+  type    = string
 }
 
 variable "instance_type" {

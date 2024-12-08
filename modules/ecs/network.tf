@@ -1,5 +1,5 @@
 resource "aws_security_group" "ecs_lb" {
-  name   = "${var.project}-ecs-lb-sg"
+  name   = "${var.project}-ecs-lb"
   vpc_id = var.vpc_id
 
   ingress {
@@ -29,7 +29,7 @@ resource "aws_security_group" "ecs_lb" {
 }
 
 resource "aws_security_group" "ecs" {
-  name   = "${var.project}-ecs-security-group"
+  name   = "${var.project}-ecs"
   vpc_id = var.vpc_id
 
 }
@@ -88,6 +88,7 @@ resource "aws_lb" "ecs_alb" {
   subnets            = [for subnet in var.public_subnets : subnet]
   security_groups    = [aws_security_group.ecs.id]
 
+  depends_on = [ aws_security_group.ecs_lb ]
   tags = {
     Name = "ecs-alb"
   }
@@ -97,6 +98,8 @@ resource "aws_lb_listener" "ecs_alb_listener" {
   load_balancer_arn = aws_lb.ecs_alb.arn
   port              = 80
   protocol          = "HTTP"
+
+  depends_on = [ aws_security_group.ecs_lb ]
 
   default_action {
     type             = "forward"
@@ -110,6 +113,8 @@ resource "aws_lb_target_group" "ecs_tg" {
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = var.vpc_id
+
+  depends_on = [ aws_security_group.ecs_lb ]
 
   health_check {
     path = "/"

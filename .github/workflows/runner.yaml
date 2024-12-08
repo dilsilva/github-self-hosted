@@ -33,6 +33,7 @@ jobs:
           # exit-code: '1' #Error in case of vulnerabilities
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities 
+          cache: 'false'
 
       - name: Login to ECR
         id: login-ecr

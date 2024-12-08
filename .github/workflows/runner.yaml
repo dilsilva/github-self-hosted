@@ -7,19 +7,13 @@ env:
   ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com
   ECR_REPOSITORY: go-app
 
+
+
 jobs:
   build:
     name: CI
     runs-on: self-hosted
     steps:
-      - name: Set globals
-        id: globals
-        shell: bash
-        run: |
-          echo "  ECS_CONTAINER_NAME=go-app" >> "${GITHUB_OUTPUT}"
-          echo "  ECS_SERVICE_NAME=surepay-service" >> "${GITHUB_OUTPUT}"
-          echo "  ECS_CLUSTER_NAME=surepay-ecs" >> "${GITHUB_OUTPUT}"
-
       - name: Check out code
         uses: actions/checkout@v4
 
@@ -69,14 +63,14 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: ${{ steps.globals.outputs.ECS_CONTAINER_NAME }}
+          container-name: go-app
           image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ steps.globals.outputs.ECS_SERVICE_NAME }}
-          cluster: ${{ steps.globals.outputs.ECS_CLUSTER_NAME }}
+          service: surepay-service 
+          cluster: surepay-ecs
           desired-count: 4
           wait-for-service-stability: true

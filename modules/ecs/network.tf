@@ -1,4 +1,5 @@
 resource "aws_security_group" "ecs_lb" {
+    description = "Security group of LB for ECS"
   name   = "${var.project}-ecs-lb"
   vpc_id = var.vpc_id
 
@@ -29,13 +30,14 @@ resource "aws_security_group" "ecs_lb" {
 }
 
 resource "aws_security_group" "ecs" {
+  description = "Security group for ECS workloads"
   name   = "${var.project}-ecs"
   vpc_id = var.vpc_id
 
 }
 
 resource "aws_security_group_rule" "lb_runner_tcp" {
-  description = "Incoming shh traffic to ecs"
+  description = "Incoming shh traffic from LB to ECS"
   type        = "ingress"
   from_port   = 22
   to_port     = 22
@@ -46,7 +48,7 @@ resource "aws_security_group_rule" "lb_runner_tcp" {
 }
 
 resource "aws_security_group_rule" "lb_runner_ssh" {
-  description = "Incoming tcp traffic to ecs"
+  description = "Incoming SSH traffic from LB to ecs"
   type        = "ingress"
   from_port   = 80
   to_port     = 80
@@ -57,7 +59,7 @@ resource "aws_security_group_rule" "lb_runner_ssh" {
 }
 
 resource "aws_security_group_rule" "lb_runner_ssl" {
-  description = "Incoming ssl traffic to ecs"
+  description = "Incoming ssl traffic from LB to ecs"
   type        = "ingress"
   from_port   = 443
   to_port     = 443
@@ -68,7 +70,7 @@ resource "aws_security_group_rule" "lb_runner_ssl" {
 }
 
 resource "aws_security_group_rule" "egress_runner" {
-  description = "Outgoing traffic from runner to instances"
+  description = "Outbound traffic from runner to instances"
   type        = "egress"
   from_port   = "0"
   to_port     = "65535"
@@ -86,7 +88,7 @@ resource "aws_lb" "ecs_alb" {
   internal           = false
   load_balancer_type = "application"
   subnets            = [for subnet in var.public_subnets : subnet]
-  security_groups    = [aws_security_group.ecs.id]
+  security_groups    = [aws_security_group.ecs_lb.id]
 
   depends_on = [ aws_security_group.ecs_lb ]
   tags = {

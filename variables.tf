@@ -12,8 +12,8 @@ variable "default_tags" {
   default = {
 
     Environment = "Dev"
-    Owner       = "Surepay"
-    Project     = "Surepay"
+    Owner       = "surepay"
+    Project     = "surepay"
 
   }
   description = "Default Tags for Project"
@@ -45,11 +45,14 @@ variable "azs" {
 #Runner
 variable "ami_id" {
   default = "ami-0e9085e60087ce171" #Ubuntu
-  # default = "ami-047bb4163c506cd98" #Anazon Linyx
-  type    = string
+  type = string
 }
 
-#EKS
 variable "instance_type" {
   default = "t2.medium"
 }
+
+variable "app_name" {
+  default = "go-app"
+}
+

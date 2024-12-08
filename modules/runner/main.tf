@@ -27,7 +27,7 @@ resource "aws_launch_template" "runner_launch_template" {
   iam_instance_profile {
     name = aws_iam_instance_profile.runner_host_profile.name
   }
-  
+
   key_name = var.runner_host_key_pair
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {

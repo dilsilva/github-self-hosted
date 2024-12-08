@@ -1,11 +1,6 @@
 name: Deploy to ECR
 
 on: push
-env:
-  AWS_ACCOUNT: 061051224299
-  AWS_REGION: eu-west-1
-  ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com
-  ECR_REPOSITORY: go-app
 
 jobs:
   build:
@@ -18,6 +13,8 @@ jobs:
       - name: Build and tag image
         id: build-image
         env:
+          ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com
+          ECR_REPOSITORY: go-app
           TAG_COMMIT: ${{ github.sha }}
         run: |
           cd app/
@@ -40,6 +37,7 @@ jobs:
         env:
           AWS_ACCOUNT: 061051224299
           AWS_REGION: eu-west-1
+          ECR_REGISTRY: 061051224299.dkr.ecr.eu-west-1.amazonaws.com
         run: |
             docker login -u AWS -p $(aws ecr get-login-password --region $AWS_REGION) $ECR_REGISTRY
 

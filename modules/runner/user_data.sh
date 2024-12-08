@@ -45,7 +45,5 @@ RUNNER_ALLOW_RUNASROOT=true ./config.sh --url ${github_url} --unattended --token
 # Install as service
 RUNNER_ALLOW_RUNASROOT=true  ./svc.sh install
 echo ==== ACTIONS-RUNNER DONE ====
-INSTANCE_ID=`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`
-aws ec2 create-tags --region ${aws_region} --resources $INSTANCE_ID --tags Key=terraform-aws-github-runner:setup,Value=done
 
 RUNNER_ALLOW_RUNASROOT=true ./run.sh

@@ -32,3 +32,8 @@ variable "app_image" {
   type        = string
   description = "Image of the APP"
 }
+
+variable "private_instances_security_group" {
+  type        = string
+  description = "ID of the SG used for internal communication between instances"
+}

@@ -29,7 +29,7 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: terraform plan -no-color
-        continue-on-error: true
+      continue-on-error: true
         
     - name: Render terraform docs and push changes back to PR
       uses: terraform-docs/gh-actions@main

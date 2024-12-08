@@ -11,7 +11,7 @@ func main() {
    app.Run(":80")
 }
 func Hello(c *gin.Context) {
-  c.Writer.Write([]byte("<h1> hello k8s </h1>"))
+  c.Writer.Write([]byte("<h1> hello ecs </h1>"))
 }
 EOF
 RUN ls

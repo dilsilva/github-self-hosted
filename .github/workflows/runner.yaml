@@ -22,18 +22,18 @@ jobs:
         run: |
           cd app/
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT . 
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT $ECR_REGISTRY/$ECR_REPOSITORY:latest  
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT 
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$TAG_COMMIT" >> $GITHUB_OUTPUT
 
-      # # - name: Run Trivy vulnerability scanner
-      # #   uses: aquasecurity/trivy-action@0.28.0
-      # #   with:
-      # #     image-ref: ${{ steps.build-image.outputs.image }}
-      # #     format: 'table'
-      # #     hide-progress: true
-      # #     # exit-code: '1' #Error in case of vulnerabilities
-      # #     ignore-unfixed: true
-      # #     severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities 
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ steps.build-image.outputs.image }}
+          format: 'table'
+          hide-progress: true
+          # exit-code: '1' #Error in case of vulnerabilities
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH' #Ignore low severity vulnerabilities 
 
       - name: Login to ECR
         id: login-ecr
@@ -49,12 +49,11 @@ jobs:
           TAG_COMMIT: ${{ github.sha }}
         run: |
           docker push ${{ steps.build-image.outputs.image }}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           sudo rm /root/.docker/config.json
 
       - name: Download task definition
         run: |
-          aws ecs describe-task-definition --task-definition goserver --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition --task-definition surepay-task --query taskDefinition > task-definition.json
           cat task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
@@ -62,13 +61,13 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: ecs-sample
+          container-name: goserver
           image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: goserver 
-          cluster: cicdtest-ecs
+          service: surepay-service 
+          cluster: surepay-ecs
           wait-for-service-stability: true

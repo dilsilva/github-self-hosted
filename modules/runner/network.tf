@@ -124,7 +124,6 @@ resource "aws_security_group_rule" "egress_runner" {
   cidr_blocks = ["0.0.0.0/0"]
 
   security_group_id = aws_security_group.runner_host_security_group.id
-  # source_security_group_id = aws_security_group.runner_host_security_group.id
 }
 
 #priv

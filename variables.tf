@@ -56,3 +56,11 @@ variable "app_name" {
   default = "go-app"
 }
 
+variable "aws_secret_key" {
+  default = "aws_secret_key"
+}
+
+variable "aws_access_key" {
+  default = ""
+}
+

@@ -1,3 +1,6 @@
+## Architecture
+![architecture schema](architecture.png)
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

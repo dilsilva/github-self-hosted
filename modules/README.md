@@ -2,6 +2,7 @@
 ## Architecture
 
 ![architecture schema](architecture.png)
+
 ## Requirements
 
 No requirements.
